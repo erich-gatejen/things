@@ -1,0 +1,113 @@
+
+
+
+thing -> automat
+
+- RESULT - enum
+
+- OPERATION
+	- DEFINITION
+		- RECORDED
+	- PROCESS
+		- CALL
+		- INSTANCE
+		- METHOD 
+	- CATCH_FAULT
+	- CATCH_ERROR
+	
+- MODULE
+	- DEFINITION
+	- INIT
+	- FLUSH
+	- DESTROY
+	- implementations
+
+- AUTOMAT - MODULE
+
+
+- RECORDER
+
+
+- VAR
+	- VARIABLE
+	- TABLE
+	- 
+
+
+
+class thing.to.do extends THING {
+
+	DECLARACTION() {
+		
+		REQUIRE(TYPE_TABLE, "main_table");
+	}
+
+	INIT() {
+		RESULT_DEFAULT("OK", Numerics.OK);	
+	}
+
+	PROCESS() {
+		RESULT		returnvalue		= LOCAL_RETURN();		
+		TABLE		stuffy_table		= NEW_TABLE();
+		String		someVariable;
+
+		MODULE  scanner        		= INSTANCE("modules.Scanner", "master.scanner");
+		MODULE	scanner			= LOCAL_INSTANCE("modules.Scanner");
+		MODULE	connecton		= INSTANCE("modules.Connection");
+
+
+		scanner.INIT();
+		connection.INIT("192.168.1.122");
+
+		RESULT = connection.send(stuffy_table);
+
+		THING	thingy			= THINGER("thing.to.do.more");
+		thingy.CALL();
+		
+
+		TABLE	mytable			= NEW_TABLE();
+		SHEET	mysheet			= NEW_SHEET(5,5);
+
+		EVENT(__name__,__value___,__channel__);
+		LOG("Holy goat hairs, batman", "6501");		
+	
+	}
+
+	FINALLY() {           
+	}
+
+
+	CATCH_FAULT() {
+
+	}
+
+	CATCH_ERROR() {
+
+	}  
+	
+}
+
+
+
+
+
+START ->
+	RUN_SCRIPT
+		-> LOAD_SCRIPT
+		-> CREATE_CONNECTION
+	loop{
+	 SEND
+		-> TRANSACTION
+	}
+
+
+
+
+
+
+
+
+
+
+
+	

@@ -1,0 +1,7 @@
+# THINGS/THINGER 2004
+# Copyright Erich P Gatejen (c) 2004, 2005, 2005  ALL RIGHTS RESERVED
+# This is not to be distributed without written permission. 
+
+# This configuration is for the developers environment
+
+config	either	

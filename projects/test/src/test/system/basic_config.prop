@@ -1,0 +1,68 @@
+# THINGS/THINGER 2009
+
+# BASIC CONFIGUATION FOR KERNELBASIC for SYSTEM TESTING 
+
+# ###########################################################################################################
+# KERNEL configuration
+
+# Root filesystem
+kb.user.filesystem.root=$install.root$
+kb.system.filesystem.root=$install.root$
+
+# Default universe
+kb.universe.config=/etc/default_universe.prop
+kb.universe.system.default=system.space
+kb.universe.user.default=user.space
+
+# Logging configuration
+kb.logging.level=DEBUG
+kb.logging.factory.implementation=test.system.testtools.KernelBasic_WriterLogger_BroadInterceptionFactory
+
+# Debugging through an IDE configuration.  The default is the normal one (FALSE).  Set it to TRUE if you want to 
+# step through your THINGS in your IDE.  Of course, this will remove any of the dynamic loading functionality.
+kb.debugging.ide=TRUE
+
+# THING space configuration
+# kb.things.cache defines the location within universe/system space for the cache
+# kb.things.universe.# lists all the universe(s) where THINGS sit.  They will be search in the numbered order.
+kb.things.cache=system.space:/cache/
+kb.things.universe.1=test.space:/
+kb.things.universe.2=system.space:/
+kb.things.universe.3=user.space:/
+
+
+# ###########################################################################################################
+# Service configuration
+# kb.core.service.{service name}.name	= NAME
+# kb.core.service.{service name}.class	= CLASS
+# kb.core.service.{service name}.local = Local propery tree, visible to the service by getLocalProperties.
+
+kb.core.service.localcommandservice.name=LocalCommandService
+kb.core.service.localcommandservice.class=things.thinger.service.command.local.LocalCommandService
+kb.core.service.localcommandservice.local.command_channel=kb.core.service.localcommandservice
+
+kb.core.service.cli.name=CLIService
+kb.core.service.cli.class=test.system.testtools.CLIServiceWrapper
+kb.core.service.cli.local.SCRUB=info
+kb.core.service.cli.local.command_channel=kb.core.service.localcommandservice
+kb.core.service.cli.local.response_channel=kb.core.service.cliservice
+
+kb.core.service.httpcliservice.name=HttpCliService
+kb.core.service.httpcliservice.class=things.thinger.service.local.HttpCLIService
+kb.core.service.httpcliservice.local.listen=8801
+
+kb.core.service.consoleservice.name=ConsoleService
+kb.core.service.consoleservice.class=things.thinger.service.local.ConsoleService
+
+# Not doing this service for now.
+#kb.core.service.httptoolservice.name=HttpToolService
+#kb.core.service.httptoolservice.class=things.thinger.service.httptool.HttpToolService
+#kb.core.service.httptoolservice.local.listen=8802
+#kb.core.service.httptoolservice.local.manager.page=things.thinger.service.httptool.stock.PageManager_Stock
+#kb.core.service.httptoolservice.local.manager.page.addy=system.space:/pages
+#kb.core.service.httptoolservice.local.manager.action=things.thinger.service.httptool.stock.ActionManager_Stock
+
+# ###########################################################################################################
+# Starting USER Space properties
+
+user.kernel.name=KernelBasic

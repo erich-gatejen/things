@@ -1,0 +1,12 @@
+# THINGS/THINGER 2009
+# Copyright Erich P Gatejen (c) 2004, 2005, 2006  ALL RIGHTS RESERVED
+# This is not to be distributed without written permission. 
+
+# Defines the installation properties for the developers environment.
+# It will be used to build the test area.
+
+# REMEMBER: Do not add install.root to this file!  
+
+# Change this to the install path for your JDK.  
+# It must be the full JRE.
+java.jdk=C:\bin\jdk1.6.0_10

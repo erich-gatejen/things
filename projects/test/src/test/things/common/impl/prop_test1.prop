@@ -1,0 +1,21 @@
+# properties test
+# goat
+
+root1=goat goat goat
+root2=prop
+root3= sdf sdf sdf&
+dsf
+root4=hoohaa
+
+level1.1=1
+level1.2=2
+level1.level2=level2
+level1.level2.1=1
+level1.level2.2=2
+level1.level2.3=3
+level1.another2.1=1
+level1.another2.level3=level3
+level1.another2.level3.1=1
+
+close=hohoho
+

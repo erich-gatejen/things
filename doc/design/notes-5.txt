@@ -1,0 +1,61 @@
+
+
+VAR
+	-> RESULT = TABLE, meta
+	-> TABLE
+		-> VAR
+	-> SHEET
+		-> VAR
+	-> MODULE
+
+
+class	my.thing extends THING {
+
+
+	DEFINE() {
+		REQUIRED_PARAMETER("target");
+		OPTIONAL_PARAMETER(TABLE, "session");
+		RECORDER()l
+	
+	}
+
+	PROCESS() {
+		RESULT	myResult = GET_RESULT();
+
+		TABLE connectionInfo = GET_TABLE(GLOBAL, "connection.info");
+		TABLE session = GET_PARAM("session");
+		if (session==null) GET_TABLE("my.session");
+
+		if (!connectionInfo.CONTAINS("sender") ) {
+			MODULE	senderModule = INSTANCE("module.Sender");
+			senderModule.CALL(module.Sender.INIT, session);		
+		}
+			
+
+
+	}
+
+
+	// === optional overrides ===
+	
+	FINALLY() {
+
+	}
+
+	HANDLE_ERROR() {
+		myResult.set(FAILED);
+	}
+
+	HANDLE_FAULT() {
+		myResult.set(FAILED);
+		INTANCE_DEATH();
+	}
+
+	INIT() {
+
+
+	}
+
+
+
+}

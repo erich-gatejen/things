@@ -1,0 +1,390 @@
+<project name="things" default="dist" basedir=".">
+    <description>
+        Things
+    </description>
+  <!-- set global properties for this build -->
+  <property name="things.src" location="projects/things/src"/>
+  <property name="things.bin" location="projects/things/bin"/>
+  <property name="test.src" location="projects/test/src"/>
+  <property name="test.bin" location="projects/test/bin"/>
+  <property name="common.libraries" location="lib"/>
+  
+  <property name="dist"  location="dist"/>
+  <property name="doc" location="doc"/>
+  <property name="content" location="content"/>
+  <property name="test" location="test"/>
+  <property name="javac.debug" value="true"/>
+  
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${dist}"/>
+  </target>
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- CLASS PATHS    -->
+     
+  <path id="things.class.path">
+      <pathelement path="${classpath}"/>
+      <fileset dir="lib">
+        <include name="**/*.jar"/>
+      </fileset>
+      <pathelement location="${things.bin}"/>
+  </path>
+  <path id="test.class.path">
+      <pathelement path="${classpath}"/>
+      <fileset dir="lib">
+        <include name="**/*.jar"/>
+      </fileset>
+      <pathelement location="${things.bin}"/>
+      <pathelement location="${test.bin}"/>
+  </path>
+
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: compile	COMPILE SYSTEM      XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  -->
+  <target name="compile" depends="compile.test"
+        description="compile Things and tests" >
+  </target>
+  
+   <target name="compile.things" depends="init,clean.things"
+        description="compile Things" >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <mkdir dir="${things.bin}"/>
+    <javac srcdir="${things.src}" destdir="${things.bin}" debug="${javac.debug}">
+       <classpath refid="things.class.path"/>
+    </javac>
+  </target>
+  
+   <target name="compile.test" depends="init,clean.test,compile.things"
+        description="compile tests" >
+    <!-- Compile the java code from ${src} into ${build} -->
+    <mkdir dir="${test.bin}"/>
+    <javac srcdir="${test.src}" destdir="${test.bin}" debug="${javac.debug}">
+       <classpath refid="test.class.path"/>
+    </javac>
+  </target>
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: docs		MAKE DOCUMENTATION   XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  -->
+  <target name="docs" depends="init" 
+        description="generate the documentation" >
+  	<delete dir="${dist}/doc"/>
+  	<delete dir="${doc}/api"/>
+   	<mkdir dir="${dist}/doc"/>
+
+	<javadoc packagenames="things.*"
+	   sourcepath="${things.src}"
+	   defaultexcludes="yes"
+	   destdir="${doc}/api"
+	   author="true"
+	   version="true"
+	   use="true"
+	   windowtitle="Things">
+	   <classpath refid="things.class.path"/>
+<!--	   <docTitle><![CDATA[<h1>Things</h1>]]></doctitle> -->
+	   <bottom><![CDATA[<i>Things.</i>]]></bottom>
+<!--	   <tag name="todo" scope="all" description="To do:" />
+	   <group title="Group 1 Packages" packages="com.dummy.test.a*"/>
+	   <group title="Group 2 Packages" packages="com.dummy.test.b*:com.dummy.test.c*"/>-->
+	   <link offline="true" href="http://java.sun.com/javase/6/docs/api/" packagelistLoc="C:\tmp"/>
+	</javadoc>
+	
+	<copy todir="${dist}/doc" overwrite="true">
+    		<fileset dir="${doc}/"/>
+    </copy>
+  </target>
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: dist	BUILD DISTRIBUTION     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  -->
+  <target name="dist" depends="clean.things,init,compile,docs"
+        description="generate the distribution" >
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}/lib"/>
+
+    <!-- JAR it -->
+    <jar jarfile="${dist}/lib/thingssystem.jar" basedir="${things.bin}"/>
+    
+        <!-- JAR it -->
+    <jar jarfile="${dist}/lib/thingstest.jar" basedir="${test.bin}"/>
+    
+    <!-- JAR MANIFEST -->   
+    <jar jarfile="${dist}/lib/things.jar" manifest="${content}/build/MANIFEST.MF"/>
+      
+    <!-- drag the rest of the content -->
+    <copy todir="${dist}/lib" overwrite="true">
+    	<fileset dir="lib"/>
+    </copy>
+    
+    <copy todir="${dist}/universe">
+       <fileset dir="${content}/universe"/>
+    </copy>
+ 
+     <copy todir="${dist}/etc">
+       <fileset dir="${content}/etc"/>
+    </copy>
+ 
+    <copy todir="${dist}/bin">
+       <fileset dir="${content}/bin"/>
+    </copy>
+    
+    <!-- capture the non-java data from source -->    
+    <copy todir="${dist}/etc/things" overwrite="true" includeEmptyDirs="false">
+	<fileset dir="${things.src}/things">
+		<exclude name="**/*.java"/>
+	</fileset>
+    </copy>
+    
+    <!-- capture the non-java data from source for test -->    
+    <copy todir="${dist}/etc/test/" overwrite="true" includeEmptyDirs="false">
+        <fileset dir="${test.src}/test/">
+        <exclude name="**/*.java"/>
+        </fileset>
+    </copy>
+    
+    <copy todir="${dist}">
+		<fileset dir="${content}">
+			<include name="README.TXT"/>
+			<include name="install.*"/>
+			<include name="VERSION"/>
+			<include name="LICENSE"/>
+		</fileset>
+    </copy>
+    
+    <!-- Create log directory -->
+    <mkdir dir="${dist}/log"/>
+  
+  </target>
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: cleanit  	CLEAN DEV ENVIRONMENT     XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX  -->
+	<target name="cleanit" depends="clean.things,clean.test"
+        description="clean before" >
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<!-- <delete dir="${bin}"/>
+		<delete dir="${dist}"/>  -->
+	</target>
+  
+	<target name="clean.things"
+        description="clean things" >
+    <delete includeEmptyDirs="true" failonerror="false">
+		<fileset dir="${things.bin}"/>
+    </delete>
+	 <delete includeEmptyDirs="true" failonerror="false">
+		<fileset dir="${test.bin}"/>
+    </delete>
+	<delete includeEmptyDirs="true" failonerror="false">
+		<fileset dir="${dist}"/>
+    </delete>
+  </target>
+  
+  <target name="clean.test"
+        description="clean things" >
+    <delete includeEmptyDirs="true" failonerror="false">
+		<fileset dir="${test}"/>
+    </delete>
+  </target>  
+   
+   
+   
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: package  	PACKAGE IT                XXXXXXXXXXXXXXXXXXXXXXXXXXX  --> 
+   <target name="package" description="create the binary package" >
+    	<delete includeEmptyDirs="true" failonerror="false">
+		<fileset file="binary-package.zip"/>
+    	</delete>
+    	<!-- JAR it -->
+    	<jar jarfile="things-binary-package.zip" basedir="${dist}"/>
+   </target>
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: createtest   CREATE DEVELOPERS TEST ENVIRONMENT     XXXXXXXXXXXXXXXX  -->  
+  <target name="test" depends="cleanit, dist, test.create, freshen.test, test.configure, test.tidy"
+        description="create and configure test environment" >
+  </target>
+  
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: createtest   CREATE DEVELOPERS TEST ENVIRONMENT w/o CONFIG  XXXXXXXX  -->  
+  <target name="test.unconfigured" depends="test.create, freshen.test"
+        description="create and configure test environment that isn't configured" >
+  </target>
+  
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: createtest   CREATE DEVELOPERS TEST ENVIRONMENT     XXXXXXXXXXXXXXXX  -->  
+   <target name="test.create" 
+        description="create dev test environment" >
+	    
+	    <!-- Whack the old one -->
+	    <delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${test}"/>
+         </delete>
+
+	    <!-- Create the new one -->	    
+	    <copy todir="${test}" overwrite="true">
+	       <fileset dir="${dist}/"/>
+	    </copy>
+	    
+	   <!-- Create config directories -->
+   	    <mkdir dir="${test}/etc/checkpoint/factory"/>
+   	    <mkdir dir="${test}/etc/checkpoint/install"/>
+	    
+	    <!-- Model the install process -->
+	    <!-- It will stuff the property install.root propery at the end of  -->
+	    <!-- of the config.prop file and use it for the install -->	   
+	    <copy todir="${test}">
+	       <fileset file="./installconfig.prop"/>
+	    </copy>
+	    <echo file="${test}/installconfig.prop" append="true">
+# root
+install.root=${test}
+
+	    </echo>
+	    
+    </target>
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: configuretest    CONFIGURE DEVELOPERS TEST ENVIRONMENT XXXXXXXXXXXXX  -->  
+   <target name="test.configure"
+        description="configure dev test environment" >
+	    
+	    <!-- factory checkpoint -->
+	    <java classname="things.common.configuration.ConfigureByProps">
+	    	<classpath>
+	    	           <pathelement path="${java.class.path}"/>
+	    	           <pathelement path="${dist}/lib/thingssystem.jar"/>	    	           
+	    	           <pathelement path="${dist}/lib/commons-collections-3.1.jar"/>
+	        </classpath>
+	    	<arg value="checkpoint"/> 
+	    	<arg value="${content}/etc/config.layout"/>
+	    	<arg value="${test}"/> 
+	    	<arg value="${test}/etc/checkpoint/factory"/> 
+	    </java>	   
+	    
+	    <!-- configure -->
+	    <java classname="things.common.configuration.ConfigureByProps">
+	    	<classpath>
+	    	           <pathelement path="${java.class.path}"/>
+	    	           <pathelement path="${dist}/lib/thingssystem.jar"/>
+	    	           <pathelement path="${dist}/lib/commons-collections-3.1.jar"/>	    	           
+	        </classpath>
+	    	<arg value="configure"/> 
+	    	<arg value="${content}/etc/config.layout"/>
+	    	<arg value="${test}/etc/checkpoint/factory"/> 
+	    	<arg value="${test}"/> 
+	    	<arg value="${test}/installconfig.prop"/> 	    	
+	    </java>
+
+	    <!-- install checkpoint -->
+	    <java classname="things.common.configuration.ConfigureByProps">
+	    	<classpath>
+	    	           <pathelement path="${java.class.path}"/>
+	    	           <pathelement path="${dist}/lib/thingssystem.jar"/>
+	    	           <pathelement path="${dist}/lib/commons-collections-3.1.jar"/>	    	           
+	        </classpath>
+	    	<arg value="checkpoint"/> 
+	    	<arg value="${content}/etc/config.layout"/>
+	    	<arg value="${test}"/> 
+	    	<arg value="${test}/etc/checkpoint/install"/> 
+	    </java>	
+	      
+    </target>
+	
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: test.tidy   TIDY THE TEST AREA.                             XXXXXXXX  -->  
+  <target name="test.tidy" 
+        description="tidy up the test area after install" >
+		
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${test}">
+				<include name="install.*"/>
+				<include name="install.*"/>				
+			</fileset>
+		</delete>
+
+	</target>
+    
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: freshen.test	FRESHEN THE TEST ENVIRONMENT         XXXXXXXXXXXXXXXX  -->      
+   <target name="freshen.test" depends="freshen.test.things"
+        description="update the test environment with the new build" >
+	
+	<!-- Make sure the destination exists -->
+	
+	<!-- JAR system -->
+	<jar destfile="${test}/lib/thingssystem.jar" basedir="${things.bin}"/>
+
+	<!-- JAR test -->
+	<jar destfile="${test}/lib/thingstest.jar" basedir="${test.bin}"/>
+	
+    </target>
+    
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: freshen.test.things	FRESHEN THE THINGS IN THE TEST ENVIRONMENT XX  -->      
+   <target name="freshen.test.things"
+        description="update the THINGS in the test environment " >
+
+	<!-- Make sure test THINGS are fresh -->
+       <copy todir="${test}/universe/test/test/system/universe_things/" overwrite="true">
+	    <fileset dir="${test.src}/test/system/universe_things/"/>
+	</copy>
+	
+    </target>
+    
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: run.unittest	RUN THE UNIT TEST                    XXXXXXXXXXXXXXXX  -->      
+   <target name="run.unittest" depends="freshen.test"
+        description="run the unit test" >
+
+	    <java classname="test.things.CLIThingsUnitSuiteTester">
+	    	<classpath>
+	    	           <pathelement path="${java.class.path}"/>
+	    	           <pathelement path="${test}/lib/things.jar"/>
+	    	           <pathelement path="${test}/lib/thingstest.jar"/>	    	           
+	        </classpath>
+	    	<arg value="${test}/etc/test/things/suite.prop"/> 
+	    </java>	
+
+    </target>
+
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  -->
+<!-- XXX TARGET: run.systemtest	RUN THE INTEGRATED SYSTEM TEST       XXXXXXXXXXXXXXXX  -->      
+   <target name="run.systemtest" depends="freshen.test"
+        description="run the integrated system test" >
+        
+        <!-- clean logs -->
+	  <delete includeemptydirs="true" failonerror="false">
+	    <fileset dir="${test}/log" includes="**/*"/>
+	  </delete>
+
+	    <java classname="test.system.CLISystemSuiteTester">
+	    	<classpath>
+	    	           <pathelement path="${java.class.path}"/>
+	    	           <pathelement path="${test}/lib/things.jar"/>	   
+	    	           <pathelement path="${test}/lib/thingstest.jar"/>	                          
+	        </classpath>
+	        <arg value="${test}/etc/test/system/suite.prop"/> 
+	    	<arg value="${test}/etc/test/system/basic_config.prop"/> 
+	    </java>	
+
+    </target>
+  
+</project>
+
+
+
+

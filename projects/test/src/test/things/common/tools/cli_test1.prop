@@ -1,0 +1,7 @@
+# properties test for command line
+
+property.1=property1
+property.2=property_2
+property.3="property 3"
+
+

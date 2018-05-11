@@ -1,0 +1,128 @@
+// ^@	CTRL	0	0	0	NUL	null
+// ^A	CTRL	1	1	1	SOH	start of heading
+// ^B	CTRL	2	2	2	STX	start of text
+// ^C	CTRL	3	3	3	ETX	end of text
+// ^D	CTRL	4	4	4	EOT	end of transmission
+// ^E	CTRL	5	5	5	ENQ	enquiry
+// ^F	CTRL	6	6	6	ACK	acknowledge
+// ^G	CTRL	7	7	7	BEL	bell
+// ^H	CTRL	8	8	10	BS	backspace
+// ^I	WS	9	9	11	TAB	horizontal tab
+// ^J	LF	10	A	12	LF	new line
+// ^K	CTRL	11	B	13	VT	vertical tab
+// ^L	CTRL	12	C	14	FF	new page
+// ^M	CR	13	D	15	CR	carriage return
+// ^N	CTRL	14	E	16	SO	shift out
+// ^O	CTRL	15	F	17	SI	shift in
+// ^P	CTRL	16	10	20	DLE	data link escape
+// ^Q	CTRL	17	11	21	DC1	device CONTROL, 1
+// ^R	CTRL	18	12	22	DC2	device CONTROL, 2
+// ^S	CTRL	19	13	23	DC3	device CONTROL, 3
+// ^T	CTRL	20	14	24	DC4	device CONTROL, 4
+// ^U	CTRL	21	15	25	NAK	negative acknowledge
+// ^V	CTRL	22	16	26	SYN	synchronous idle
+// ^W	CTRL	23	17	27	ETB	end of trans. block
+// ^X	CTRL	24	18	30	CAN	cancel
+// ^Y	CTRL	25	19	31	EM	end of medium
+// ^Z	CTRL	26	1A	32	SUB	substitute
+// ^[	CTRL	27	1B	33	ESC	escape
+// ^	CTRL	28	1C	34	FS	file separator
+// ^]	CTRL	29	1D	35	GS	group separator
+// ^^	CTRL	30	1E	36	RS	record separator
+// ^_	CTRL	31	1F	37	US	unit separator
+// 	WS	32	20	40	Space	space
+// 	CHAR	33	21	41	!	
+// 	CHAR	34	22	42	"	quote (double)
+// 	CHAR	35	23	43	#	
+// 	CHAR	36	24	44	$	
+// 	CHAR	37	25	45	%	
+// 	CHAR	38	26	46	&	
+// 	CHAR	39	27	47	'	
+// 	CHAR	40	28	50	(	
+// 	CHAR	41	29	51	)	
+// 	CHAR	42	2A	52	*	
+// 	CHAR	43	2B	53	+	
+// 	CHAR	44	2C	54	,	comma
+// 	CHAR	45	2D	55	-	
+// 	CHAR	46	2E	56	.	
+//	CHAR	47	2F	57	/	slash
+// 	CHAR	48	30	60	0	
+// 	CHAR	49	31	61	1	
+// 	CHAR	50	32	62	2	
+// 	CHAR	51	33	63	3	
+// 	CHAR	52	34	64	4	
+// 	CHAR	53	35	65	5	
+// 	CHAR	54	36	66	6	
+// 	CHAR	55	37	67	7	
+// 	CHAR	56	38	70	8	
+// 	CHAR	57	39	71	9	
+// 	COLON	58	3A	72	:	colon
+// 	CHAR	59	3B	73	;	semicolon
+// .	CHAR	60	3C	74	<	
+// 	CHAR	61	3D	75	=
+// .	CHAR	62	3E	76	>
+// 	CHAR	63	3F	77	?
+// .	CHAR	64	40	100	@
+// 	CHAR	65	41	101	A
+// 	CHAR	66	42	102	B
+// 	CHAR	67	43	103	C
+// 	CHAR	68	44	104	D
+// 	CHAR	69	45	105	E
+// 	CHAR	70	46	106	F
+// 	CHAR	71	47	107	G
+// 	CHAR	72	48	110	H
+// 	CHAR	73	49	111	I
+// 	CHAR	74	4A	112	J
+// 	CHAR	75	4B	113	K
+// 	CHAR	76	4C	114	L
+// 	CHAR	77	4D	115	M
+// 	CHAR	78	4E	116	N
+// 	CHAR	79	4F	117	O
+// 	CHAR	80	50	120	P
+// 	CHAR	81	51	121	Q
+// 	CHAR	82	52	122	R
+// 	CHAR	83	53	123	S
+// 	CHAR	84	54	124	T
+// 	CHAR	85	55	125	U
+// 	CHAR	86	56	126	V
+// 	CHAR	87	57	127	W
+// 	CHAR	88	58	130	X
+// 	CHAR	89	59	131	Y
+// 	CHAR	90	5A	132	Z
+// 	CHAR	91	5B	133	[
+// 	CHAR	92	5C	134	\
+// 	CHAR	93	5D	135	]	
+// 	CHAR	94	5E	136	^	carot
+// 	CHAR	95	5F	137	_	
+// 	CHAR	96	60	140	`	
+// 	CHAR	97	61	141	a	
+// 	CHAR	98	62	142	b	
+// 	CHAR	99	63	143	c	
+// 	CHAR	100	64	144	d	
+// 	CHAR	101	65	145	e	
+// 	CHAR	102	66	146	f	
+// 	CHAR	103	67	147	g	
+// 	CHAR	104	68	150	h	
+// 	CHAR	105	69	151	i	
+// 	CHAR	106	6A	152	j	
+// 	CHAR	107	6B	153	k	
+// 	CHAR	108	6C	154	l	
+// 	CHAR	109	6D	155	m
+// 	CHAR	110	6E	156	n
+// 	CHAR	111	6F	157	o
+// 	CHAR	112	70	160	p
+// 	CHAR	113	71	161	q
+// 	CHAR	114	72	162	r
+// 	CHAR	115	73	163	s
+// 	CHAR	116	74	164	t
+// 	CHAR	117	75	165	u
+// 	CHAR	118	76	166	v
+// 	CHAR	119	77	167	w
+// 	CHAR	120	78	170	x
+// 	CHAR	121	79	171	y
+// 	CHAR	122	7A	172	z
+// 	CHAR	123	7B	173	{ 
+// 	CHAR	124	7C	174	
+// 	CHAR	125	7D	175	}
+// 	CHAR	126	7E	176	~
+// 	CHAR	127	7F	177	DEL

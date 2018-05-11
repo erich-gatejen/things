@@ -1,0 +1,54 @@
+
+
+
+
+class test1.base extends THING {
+
+
+	DEFINE() {
+		RECORDED(SUBROUTINE, "test1.connection);
+		RECORDED(SUBROUTINE, "test1.action1");
+		RECORDED(SUBROUTINE, "test1.action2");
+	}
+
+
+	RUN() {
+		SET_RECORDER(RECORDER_RESULTS, "result.conduit");
+				
+		RESULT connection = SUBROUTINE("test1.connection");
+		TABLE session = connection.getTable();
+
+		MODULE lister = INSTANCE("module.lister");
+		lister.INIT("/place/listfile");
+
+		SUBROUTINE(RECORDED, "test1.action1", session);
+
+	}
+}
+
+
+class test1.action1 extends THING {
+
+	DEFINE() {
+		PARAMETERS(1, "session.table", TABLE, REQUIRED);
+		PARAMETERS(2, "list.module", MODULE, REQUIRED);
+		RECORDED(ACCUMULATED, "transaction");
+	}
+
+
+	RUN() {
+		TABLE session = GET_PARAM_TABLE("session.table");		
+
+		MODULE sender = INSTANCE("module.sender", LOCAL);
+		sender.CALL("init", session);
+
+		MODULE lister = GET_PARAM_MODULE("list.module");	
+		
+		while(lister.ASSERT("has.more")) {
+			TABLE entry = lister.CALL("get.next");
+			session.
+		}
+ 
+	}	
+
+}

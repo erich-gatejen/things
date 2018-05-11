@@ -1,0 +1,65 @@
+
+
+
+test.transactions 	-> transaction.pay
+				-> get.connection
+
+
+			-> transaction.balance
+			
+
+
+
+
+class project.Main extends Thing {
+
+	void DEFINITION () {
+		NAME("project.Main");
+		DEFINE_RESULT(RESULT_1, "objective.1", PASS_FAIL);
+		DEFINE_RESULT(RESULT_2, "objective.2", PASS_FAIL);
+
+		ACCUMULATION(SEND_ACCUMULATION_S, "send.totals.seconds", ACCUMULATION, TIME_BUCKET, 1000);
+		ACCUMULATION(SEND_ACCUMULATION_M, "send.totals.minutes", ACCUMULATION, TIME_BUCKET, 60000);
+		ACCUMULATION(SEND_ACCUMULATION_E, "send.totals.events", ACCUMULATION, EVENT_BUCKET, 100);
+
+		// EVENT(SEND_EVENT, "sent", EXPRESS);
+
+		PARAMETER(REQUIRED, "Target");
+		PARAMETER(REQUIRED, "ListFile");
+
+
+	}
+
+	void PROCESS(TABLE	information) {
+		
+		// Setup
+		Sender 	sender = new Sender():
+		sender.init(information.get("Name"));
+		
+		Lister lister = new Lister();
+		lister.init(information.get("ListFile"));
+
+		SET_RESULT(RESULT_1, PASS);
+
+		// Run it
+		for (ListItem item : lister) {
+			Result = sender.send(item);			
+			RECORD(SEND_ACCUMULATION_M, Result);
+			EXPRESS(Result);
+		}
+		SET_RESULT(RESULT_2, PASS);			
+
+	} 
+
+
+
+	void RESULTS() {
+
+	}
+
+	// void EVENTS(Result resultEvent) {
+	// 
+	// }
+
+
+}

@@ -1,0 +1,39 @@
+class thing.to.do extends THING {
+
+	main(TABLE sessiontable, TABLE criteriatable) {
+		VAR	returnvalue		= LOCAL_RETURN();		
+		VAR	stuffy_mcthing 		= NEW();
+		VAR	stuffy_mcthing		= COPY(stuffy_mcthing);
+
+		MODULE  scanner        		= INSTANCE(modules.Scanner);
+
+		stuffy_mcthing.CALL("method_name",stuffy_mcthing,EVAL(stuffy_mcthing_copy));
+
+		THING	thingy			= THINGER("s");
+
+		TABLE	mytable			= NEW_TABLE();
+		SHEET	mysheet			= NEW_SHEET(5,5);
+
+		EVENT(__name__,__value___,__channel__);
+		LOG("Holy goat hairs, batman", "6501");
+		
+		if ( ASSERT(stuffy_mcthing) ) {
+
+		}
+	
+		returnvalue = thingy.SUB(stuffy_mcthing) EVAL((stuffy_mcthing) _copy));
+
+		
+	
+	}
+
+	CATCH_FAULT() {
+
+	}
+
+	CATCH_ERROR() {
+
+	}
+
+	
+}

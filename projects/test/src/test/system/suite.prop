@@ -1,0 +1,6 @@
+# test suite properties
+#
+
+system.root = $install.root$/etc/test/system
+
+

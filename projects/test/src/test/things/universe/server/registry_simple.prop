@@ -1,0 +1,29 @@
+# A simple universe registry. It'll manage a properties based registry. The
+# configuration will snapshot'd when the registry starts. It will never save.
+# <p>
+# <b>REGISTRY DATA for ALL: </b> <br>
+# CONFIG_LIST list=u1,u2   List of entries.  Entries may not have whitespace.<br> 
+# CONFIG_ROOT root=u1 <br>
+# <p>
+# <b>REGISTRY DATA for UNIVERSE_LOCAL: </b> <br>
+# u1.name= <br>
+# u1.type=local <br>
+# u1.path= <br>
+# u1.clearance= (none|UNCLASSIFIED|PUBLIC|PRIVATE|OFFICIAL|SENSITIVE|SECRET|PRIVILEGED|TOPSECRET|RESTRICTED|EXCLUSIVE|ELITE|EXTREME)
+# <p>
+# Clearance is as defined in things.thinger.kernel.Clearance.  It is up to the Kernel to enforce clearance when giving access to the 
+# universe server and it's universes.  Once something gets access to a universe, the Universe can assume it has free access.
+# 
+
+list=primary,secondary
+root=primary
+
+primary.name=aaaaPRIMARY1111
+primary.type=local
+primary.path=$install.root$/universe
+primary.clearance=PUBLIC
+
+secondary.name=bbbbSECONDARY2222
+secondary.type=local
+secondary.path=$install.root$/universe/test
+secondary.clearance=PUBLIC

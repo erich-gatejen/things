@@ -1,0 +1,155 @@
+	
+POST /index.html HTTP/1.0
+Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, SPLAT/SPLAT
+Accept-Language: en-us
+Content-Type: application/x-www-form-urlencoded
+UA-CPU: x86
+User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
+Host: 192.168.1.160
+Content-Length: 357
+Pragma: no-cache
+Connection: keep-alive
+Browser reload detected...
+Posting 357 bytes...
+Item=Value
+Item2=Value+SecondToken+++
+ FoldedInfo%0D%0A++MORE
+Item+3=HelloHelloHello%0D%0A%0D%0A++++
+    ++++
+
+There really is no good spec on this.
+
+URLFCHAR = Let's be forgiving.
+A 	B 	C 	D 	E 	F 	G 	H 	I 	J 	K 	L 	M 	N 	O 	P 	Q 	R 	S 	T 	U 	V 	W 	X 	Y 	Z
+a 	b 	c 	d 	e 	f 	g 	h 	i 	j 	k 	l 	m 	n 	o 	p 	q 	r 	s 	t 	u 	v 	w 	x 	y 	z
+0 	1 	2 	3 	4 	5 	6 	7 	8 	9 	- 	_ 	. 	~
+! 	* 	' 	( 	) 	; 	: 	@ 	&  	$ 	, 	/ 	?  	# 	[ 	]
+
+PERCENT = '%' for escape.
+EQU = '=' for name/value seperation.
+PLUS	= + for space replacement
+CR | LF = For item termination
+WS = All other whitespace
+
+Flags:
+	!Done = if true, we are done.  Set after a terminal closure.
+
+[START]
+-> NULL->$Name
+-> NULL->$Value
+-> FALSE->!Done
+-> NULL->$(Hex)Sixteens
+-> [OPEN]
+-> ^RETURN^
+
+[OPEN]
+	- URLFCHAR					- push, [NAME]
+	- !OTHER!					- [DEPLETE], error(Query line started bad.  Must be an allowed character.)
+	- CR						- [PENDING_LF]
+	- !EOF!						- ^RETURN^		// Done.  Nothing to do.
+	
+[NAME]
+	- %			- [ESCAPE]
+	- WS		- [DEPLETE], error(broken name in query)
+	- URLFCHAR	- push
+	- +			- push(" ")	
+	- EQU		- pop->$Name, [START_VALUE], if (!Done==TRUE) ^RETURN^
+	- CR	 	- [PENDING_LF], [FOLDNAME_OPEN], if (!Done==TRUE) ^RETURN^			// We're coming out of a fold or line, so start a new name
+	- !OTHER!	- [DEPLETE], error(bad characters in query name)
+	- !EOF!		- error(Truncated query.  Name only.)		
+	
+[FOLDNAME_OPEN]	
+	- CR | LF 	- error(Name broken and without a value.)
+	- WS		- [FOLDED_NAME], ^RETURN^
+	- !OTHER!	- [DEPLETE], error(bad folding on name, lines aborted)
+	- !EOF!		- error(Truncated query while folding name.)	
+
+[FOLDED_NAME]
+	- %			- [ESCAPE], [NAME], ^RETURN^				// return back to [NAME]
+	- URLFCHAR	- push, [NAME],^RETURN^	
+	- +			- push(" "), [NAME],^RETURN^	
+	- EQU		- pop->$Name, [VALUE], ^RETURN^	
+	- CR	 	- [PENDING_LF], [FOLDNAME_OPEN], ^RETURN^	// Recursion danger!
+	- WS		- burn	
+	- !OTHER!	- [DEPLETE], error(Bad folding on name, lines aborted)	
+	- !EOF!		- error(Truncated query while folding name.)		
+	
+[VALUE]
+	- %			- [ESCAPE]	
+	- URLFCHAR	- push
+	- WS		- [DEPLETE], error(broken value in query)	
+	- +			- push(" ")		
+	- EQU		- [DEPLETE], error(Second unencoded '=' found in query.)	
+	- CR 	 	- [PENDING_LF], [FOLDVALUE_OPEN], ^RETURN^  			// Done, so unwind back to OPEN.
+	- LF		- [DEPLETE], error(bad character in value-naked LF)
+	- !OTHER!	- [DEPLETE], error(bad character in value)	
+	- !EOF!		- [SAVE], ^RETURN^  									// Done, so unwind back to OPEN.	
+
+[FOLDVALUE_OPEN]
+	- %			- [SAVE], [ESCAPE], ^RETURN^  							// Closure.	 Push the char for the NEXT name.
+	- +			- [SAVE], push(" "), ^RETURN^  							// Closure.	 Push the char for the NEXT name.		
+	- URLFCHAR	- [SAVE], push,  ^RETURN^  								// Closure.  Push the char for the NEXT name.
+	- EQU		- [SAVE], error(Query entry started with a '='.)		// Closure but an error for the next line.	
+	- CR	 	- [PENDING_LF],	[SAVE], [SEEK_MORE], ^RETURN^ 			// Closure.  Eat until we get characters.
+	- !EOF!		- [SAVE], !Done=TRUE, ^RETURN^							// Absolute closure	
+	- WS		- [FOLDED_VALUE], ^RETURN^   							// unwind back to NAME	
+	- !OTHER!	- [DEPLETE], error(bad folding on value, lines aborted)
+	- error(Truncated query while folding name.)	
+	
+[FOLDED_VALUE]
+	- %			- [ESCAPE], [VALUE], ^RETURN^				// return back to [VALUE]
+	- URLFCHAR	- push, [VALUE],^RETURN^	
+	- +			- push(" "), [VALUE],^RETURN^	
+	- EQU		- [DEPLETE], error(Second unencoded '=' found in query.)	
+	- CR	 	- [PENDING_LF], [FOLDVALUE_OPEN], ^RETURN^	// Recursion danger!
+	- WS		- burn	
+	- !OTHER!	- [DEPLETE], error(Bad folding on value, lines aborted)	
+	- !EOF!		- [SAVE], !Done=TRUE, ^RETURN^							// Absolute Closure	
+	
+[SEEK_MORE]
+	- %			- [ESCAPE], ^RETURN^				// Push the char for the NEXT name.
+	- URLFCHAR	- push, ^RETURN^	 				// Push the char for the NEXT name.
+	- +			- push(" "), ^RETURN^	 			// Push the char for the NEXT name.		
+	- CR		- [PENDING_LF]						// Eat them
+	- !EOF!		- !Done=TRUE, ^RETURN^				// We are already closed.  And now we are done.	
+	- !OTHER!	- [DEPLETE], error(Bad next item in query or a broken fold.)		
+	
+[PENDING_LF]
+	- LF		- ^RETURN^
+	- !EOF!		- ^RETURN^ 		// Let this one slide.
+	- !OTHER!	- [DEPLETE], error(broken CR/LF--missing LF)		
+	
+[SAVE]
+-> pop->$Value
+-> (Set request NV to $Name/$Value
+-> ^RETURN^
+	
+[ESCAPE]
+	- HEX		- ->$Sixteens, ESCAPEONES, ^RETURN^
+	- !OTHER!	- error(broken escape)
+	- !EOF!		- error(Truncated line with dangling escape.)			
+	
+[ESCAPEONES]
+	- HEX		- push( ($SixteensSPLAT16)+HEX ), ^RETURN^
+	- !OTHER!	- error(broken escape)	
+	- !EOF!		- error(Truncated line with dangling escape.)			
+	
+[DEPLETE]
+	- CR		- [DEPLETE_CR], ^RETURN^
+	- !OTHER!	- burn
+	- !EOF!		- error(missing CR at end of line)
+	
+[DEPLETE_CR]
+	- LF		- ^RETURN^
+	- !EOF!		- error(missing LF after CR at end of line: truncated.)
+	- !OTHER!	- fault(missing LF after CR at end of line: odd characters found, so stream is unreliable.)
+
+[DRAIN]
+	- LF		- burn, ^RETURN^
+	- CR		- burn, ^RETURN^
+	- !EOF!		- error(bad CR/LF line termination: truncated.)	
+	- !OTHER!	- fault(bad CR/LF line termination: odd characters found, so stream is unreliable.)	
+	
+	
+	
+

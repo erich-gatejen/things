@@ -1,0 +1,44 @@
+
+
+class script_name extends MODULE {
+
+	void MAIN() {
+
+		VAR	thingie;
+
+		NEW("name","value");
+		NEW("bob");
+		
+		if (ASSERT(name)) {
+		
+		} else {
+		
+		}
+		
+		bob = CALL (INSTANCE, name, TYPE1);
+		
+		if (EQUALS(name,number)) {
+		
+		} else {
+		
+		}
+		
+		while(TRUE(name)) {
+		
+		}
+		
+		SUBROUTINE("autohit.test.GOAT", thnigie, "goat string");
+		
+		OBJECT("autohit.
+
+		METHOD()
+	
+	}
+
+	void METHOD_DOIT() {
+	 
+	
+	}
+
+}
+

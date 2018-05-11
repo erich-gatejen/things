@@ -1,0 +1,6 @@
+# test suite properties
+#
+
+unit.root = $install.root$/etc/test/things
+
+

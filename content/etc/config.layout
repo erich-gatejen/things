@@ -1,0 +1,14 @@
+# THINGS/THINGER 2009
+
+# Install config for development distribution
+
+# BASIC CONFIGURATION
+config either single /etc/basic_config.prop
+config either single /etc/default_universe.prop
+config either recurse /bin
+
+# DEVELOPMENT UNIT/SYSTEM TEST
+config either recurse /etc/test
+
+# UNIVERSE CONFIGURATION
+

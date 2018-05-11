@@ -1,0 +1,84 @@
+# THINGS/THINGER 2009
+
+# BASIC CONFIGUATION FOR KERNELBASIC
+
+# ###########################################################################################################
+# KERNEL configuration
+
+# Root filesystemw
+kb.user.filesystem.root=$install.root$
+kb.system.filesystem.root=$install.root$
+
+# Default universe
+kb.universe.config=/etc/default_universe.prop
+kb.universe.system.default=system.space
+kb.universe.user.default=user.space
+
+# Logging configuration
+kb.logging.level=DEBUG
+# kb.logging.factory.implementation=things.thinger.kernel.basic.KernelBasic_WriterLogger_StandardFactory  <-- DEFAULT
+
+# Debugging through an IDE configuration.  The default is the normal one (TRUE).  This will remove any of the
+# dynamic loading functionality.
+# NOTE: THE INTERNAL JAVA COMPILER IN 1.6 COMPILES INNER CLASSES DIFFERENTLY THAN THE THAN THE COMMAND LINE 
+# COMPILER AND IT CAN REALLY MESS THINGS UP IF YOU DYNAMICALLY UPDATE ANYTHING WITH INNER CLASSES.  FOR THIS
+# REASON, I'M LEAVING THIS AS TRUE BY DEFAULT. 
+kb.debugging.ide=TRUE
+
+# THING space configuration
+# kb.things.cache defines the location within universe/system space for the cache
+# kb.things.universe.# lists all the universe(s) where THINGS sit.  They will be search in the numbered order.
+kb.things.cache=system.space:/cache/
+kb.things.universe.1=system.space:/
+kb.things.universe.2=user.space:/
+
+# ###########################################################################################################
+# Service configuration
+# kb.core.service.{service name}.name	= NAME
+# kb.core.service.{service name}.class	= CLASS
+# kb.core.service.{service name}.local = Local propery tree, visible to the service by getLocalProperties.
+
+kb.core.service.localcommandservice.name=LocalCommandService
+kb.core.service.localcommandservice.class=things.thinger.service.command.local.LocalCommandService
+kb.core.service.localcommandservice.local.command_channel=kb.core.service.localcommandservice
+
+kb.core.service.cli.name=CLIService
+kb.core.service.cli.class=things.thinger.service.local.CLIService
+kb.core.service.cli.local.SCRUB=info
+kb.core.service.cli.local.command_channel=kb.core.service.localcommandservice
+kb.core.service.cli.local.response_channel=kb.core.service.cliservice
+
+kb.core.service.httpcliservice.name=HttpCLIService
+kb.core.service.httpcliservice.class=things.thinger.service.local.HttpCLIService
+kb.core.service.httpcliservice.local.listen=8801
+
+kb.core.service.consoleservice.name=ConsoleService
+kb.core.service.consoleservice.class=things.thinger.service.local.ConsoleService
+
+kb.core.service.httptoolservice.name=HttpToolService
+kb.core.service.httptoolservice.class=things.thinger.service.httptool.HttpToolService
+kb.core.service.httptoolservice.local.listen=8802
+kb.core.service.httptoolservice.local.pool.max=15
+kb.core.service.httptoolservice.local.manager.page=things.thinger.service.httptool.stock.PageManager_Stock
+kb.core.service.httptoolservice.local.manager.page.addy=system.space:/pages
+kb.core.service.httptoolservice.local.manager.action=things.thinger.service.httptool.stock.ActionManager_Stock
+kb.core.service.httptoolservice.local.root=system.space:/pages
+# Stock implementation accesses the localcommandservice directly.
+kb.core.service.httptoolservice.local.command_channel=kb.core.service.localcommandservice
+kb.core.service.httptoolservice.local.response_channel=kb.core.service.httptoolservice
+# Clearence for the action threads.  the default is PUBLIC.  It cannot be higher than that of the service itself, which is PRIVILEGED.
+# kb.core.service.httptoolservice.local.clearance=PUBLIC
+
+#kb.core.service.proxyservice.name=ProxyService
+#kb.core.service.proxyservice.class=things.thinger.service.proxy.ProxyService
+#kb.core.service.proxyservice.local.listen=8803
+#kb.core.service.proxyservice.local.relay.address=192.168.1.1
+#kb.core.service.proxyservice.local.relay.port=80
+#kb.core.service.proxyservice.local.proxy.processor=things.thinger.service.proxy.ProxyProcessorHttp
+#kb.core.service.proxyservice.local.proxy.session.path=user.space:/proxy
+
+# ###########################################################################################################
+# Starting USER Space properties
+
+user.kernel.name=KernelBasic
+user.console.cli.service=cli

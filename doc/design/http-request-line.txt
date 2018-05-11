@@ -1,0 +1,169 @@
+
+
+GET<SPACE>http://www.yahoo.com/monkeyPERCENT20head/?l=1207011680PERCENT20monke<SPACE>HTTP-Version<CR><LF>
+method
+<SPACE>
+
+URLCHAR = Letters (A-Z and a-z), numbers (0-9) and the characters '.', '-', '~' and '_', plus we treat # as a character because we dont' distinguish is for processing.
+
+PERCENT = %
+SPLAT	= *
+FSLASH	= /
+PLUS	= +
+QUEST	= ?
+AMP		= &
+EQU		= =
+
+[START]
+	-> NULL->$Method
+	-> NULL->$Server
+	-> NULL->$Path
+	-> NULL->$Version
+	-> NULL->$(Hex)Sixteens
+	-> FALSE->!DoneURI
+	-> [OPEN]
+	-> ^RETURN^
+
+[OPEN]
+	- URLCHAR	- push, METHOD, ^RETURN^
+	- !OTHER!	- [DEPLETE], error(must start with a character)
+	- !EOF!		- fault(No request present)
+	
+[METHOD]
+	- URLCHAR	- push
+	- PERCENT	- [ESCAPE]
+	- WS		- pop->$Method, [POSTMETHOD], ^RETURN^
+	- CR | LF 	- error(terminated after METHOD)
+	- !OTHER!	- [DEPLETE], error(expecting method)
+	- !EOF!		- fault(Only METHOD present)	
+	
+[POSTMETHOD]
+	- WS		- burn
+	- SPLAT		- ""->$Server, ->$Path, [STAR], ^RETURN^
+	- FSLASH	- ""->$Server, push, [PATH], ^RETURN^
+	- URLCHAR	- push, [SERVER], ^RETURN^
+	- PERCENT	- [ESCAPE]	
+	- QUEST		- [DEPLETE], error(expecteding PATH before URI)
+	- CR | LF 	- [DRAIN], error(terminated before URI)
+	- !OTHER!	- [DEPLETE], error(bad characters)
+	- !EOF!		- error(No URI present)		
+	
+[STAR]
+	- WS		- burn, [POSTSTAR], ^RETURN^
+	- CR | LF 	- [DRAIN], error(terminated without version))		
+	- !OTHER!	- [DEPLETE], error(excess characters after SPLAT)
+	- !EOF!		- error(No URI present)			
+	
+[POSTSTAR]
+	- WS		- burn
+	- CR | LF 	- [DRAIN], error(terminated without version))	
+	- URLCHAR	- push, [VERSION], ^RETURN^
+	- !OTHER!	- [DEPLETE], error(bad characters)	
+	- !EOF!		- error(No Version present)				
+	
+[SERVER] 
+	- PERCENT	- [ESCAPE]
+	- WS		- pop->$Server, ""->$Path, [VERSION], ^RETURN^
+	- FSLASH	- pop->$Server, push, [PATH], ^RETURN^
+	- QUEST		- [DEPLETE], error(expecteding PATH before URI query)
+	- URLCHAR	- push
+	- CR | LF 	- [DRAIN], error(terminated before finishing URI)
+	- !OTHER!	- [DEPLETE], error(bad characters)
+	- !EOF!		- error(No compelted URI)		
+	
+[PATH]
+	- PERCENT	- [ESCAPE]
+	- URLCHAR	- push
+	- FSLASH	- push
+	- AMP		- push
+	- PLUS		- push(" ")
+	- WS		- pop->$Path, [VERSION], ^RETURN^
+	- QUEST		- [START_URI], ^RETURN^
+	- CR | LF 	- [DRAIN], error(terminated without version)	
+	- !OTHER!	- [DEPLETE], error(bad characters in path)
+	- !EOF!		- error(No completed URI)
+	
+[START_URI]
+	- PERCENT	- [ESCAPE], [NAME]
+	- URLCHAR	- push, [NAME], if(!DoneURL==TRUE) ^RETURN^
+	- PLUS		- push(" "), [NAME], if(!DoneURL==TRUE) ^RETURN^
+	- WS		- [POST_URI], ^RETURN^
+	- CR | LF 	- [DRAIN], error(terminated without version)	
+	- !OTHER!	- [DEPLETE], error(bad characters in URI)
+	- !EOF!		- error(No completed URI)		
+	
+[NAME]
+	- PERCENT	- [ESCAPE]
+	- WS		- [DEPLETE], error(broken name in URI)
+	- URLCHAR	- push
+	- PLUS		- push(" ")	
+	- EQU		- pop->$Name, [START_VALUE], ^RETURN^
+	- CR | LF 	- [DRAIN], error(terminated without completing query name)	
+	- !OTHER!	- [DEPLETE], error(bad characters in URI query name)
+	- !EOF!		- error(Truncated URI)			
+
+[START_VALUE]
+	- PERCENT	- [ESCAPE], [VALUE], ^RETURN^
+	- WS		- [DEPLETE], error(broken value in URI)
+	- URLCHAR	- push, [VALUE], ^RETURN^
+	- PLUS		- push(" "), [VALUE], ^RETURN^
+	- CR | LF 	- [DRAIN], error(terminated completing name/value)	
+	- !OTHER!	- [DEPLETE], error(bad characters when starting value in URI)	
+	- !EOF!		- error(Truncated URI missing value for query item.)		
+	
+[VALUE]
+	- PERCENT	- [ESCAPE]
+	- URLCHAR	- push
+	- PLUS		- push(" ")		
+	- WS		- TRUE->!DoneURI, [SETNV], ^RETURN^
+	- AMP		- [SETNV], ^RETURN^
+	- CR | LF 	- [DRAIN], error(terminated while completing query value)	
+	- !OTHER!	- [DEPLETE], error(bad characters for value in URI)	
+	- !EOF!		- error(Truncated URI)		
+	
+[SETNV]
+-> pop->$Value
+-> (Set request NV to $Name/$Value
+-> ^RETURN^
+	
+[POST_URI]
+	- WS		- burn
+	- URLCHAR	- push, [VERSION], ^RETURN^	
+	- CR | LF 	- [DRAIN], error(terminated without completing VERSION)	
+	- !OTHER!	- [DEPLETE], error(bad character starting VERSION)		
+	- !EOF!		- error(No version present.)			
+	
+[VERSION]
+	- URLCHAR	- push
+	- FSLASH	- push
+	- CR | LF 	- [DRAIN], pop->$Version, ^RETURN^	
+	- WS		- [DEPLETE], error(spaces after VERSION)
+	- !OTHER!	- [DEPLETE], error(bad character in VERSION)		
+	- !EOF!		- error(Truncated VERSION.)		
+	
+[ESCAPE]
+	- HEX		- ->$Sixteens, ESCAPEONES, ^RETURN^
+	- !OTHER!	- error(broken escape)
+	- !EOF!		- error(Truncated line with dangling escape.)			
+	
+[ESCAPEONES]
+	- HEX		- push( ($SixteensSPLAT16)PLUSHEX ), ^RETURN^
+	- !OTHER!	- error(broken escape)	
+	- !EOF!		- error(Truncated line with dangling escape.)			
+	
+[DEPLETE]
+	- CR		- [DEPLETE_CR], ^RETURN^
+	- !OTHER!	- burn
+	- !EOF!		- error(missing CR at end of line)
+	
+[DEPLETE_CR]
+	- LF		- ^RETURN^
+	- !EOF!		- error(missing LF after CR at end of line: truncated.)
+	- !OTHER!	- fault(missing LF after CR at end of line: odd characters found, so stream is unreliable.)
+
+[DRAIN]
+	- LF		- burn, ^RETURN^
+	- CR		- burn, ^RETURN^
+	- !EOF!		- error(bad CR/LF line termination: truncated.)	
+	- !OTHER!	- fault(bad CR/LF line termination: odd characters found, so stream is unreliable.)	
+	

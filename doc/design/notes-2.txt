@@ -1,0 +1,71 @@
+class find-list-count extends THING {
+		
+
+	INIT() {
+
+	
+
+	}
+
+	SCRIPT() {
+
+		REQUIRE_INIT();
+
+		// 
+		VAR	datain   = PARAM("thing");
+
+		VAR	datanew  = NEW();
+		VAR	datauser = USED("thing");
+
+
+		if (!ASSERT("thing")) {
+			return;
+		} 
+
+		VAR 	sessiontable = NEW("INVALID");
+		
+		MODULE  mymodule = INSTANCE("autohit.call.modules.SimpleScannerModule");
+		THING   mything = THINGER("autohit/test/test1");
+		
+	
+		mymodule.METHOD("START");	// must be instantiated
+		METHOD(mymodule,"START");		// must be instantiated
+
+		mything.SUBROUTINE("autohit/test/test1",SCRIPT);
+		SUBROUTINE("autohit/test/test1",SCRIPT);
+		
+
+		if (datain.EQUALS("thing")) {
+
+		}
+		
+		CALL(INIT_CALL,thing);
+
+	}
+
+	CATCH_FAULT() {
+
+	}
+
+
+	CATCH_ERROR() {
+	
+	}
+
+
+	METHOD_DOG() {
+
+	}
+
+}
+
+
+
+
+
+
+
+SCRIPT
+
+
+

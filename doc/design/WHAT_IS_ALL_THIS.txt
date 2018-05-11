@@ -1,0 +1,33 @@
+These are various tables and notes made during development.
+Some of it was never used.  Some of it might seem silly, 
+particularly the hand generated parsers.  Remember, this was
+for experimentation, and in some cases, just to prove a point
+to a colleague.  Sometimes I was successful.  Sometimes I wasn't.
+
+The header processor was primarily part of a bet, which I 
+did win, and proved to be significantly faster than its
+competition.  However, what my challenger didn't notice 
+was that it had a critical fault--you cannot add anything to 
+the end of the header after you have processed all header lines.
+Good thing our judge never tried it.  Given how I structured the
+table, it would be difficult to add this feature, so my
+next implementation (not part of this project) looks quite 
+different.
+
+the notes represent the original direction of the
+system, where a new pseudo-language would take form
+inside java classes.  However, after we got the basic THINGs
+working, it seemed like there was no point in going any 
+further with it. 
+
+The processors will do you little good for language
+processing, since it is entirely geared toward 8-bit
+characters.  This works great it you're only concerned
+about protocols, code, and data-scripts.  It will perform
+astoundingly bad for text management.  Don't use it for that.
+
+--- UPDATE ---
+
+As of 1.2.1, HeaderProcessorv2 is fixed.  It handles header termination 
+correctly and allows you to append new headers after read all the existing ones.
+
